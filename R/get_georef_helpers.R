@@ -10,8 +10,9 @@
 #' @param filename `character` or `NULL`; optional path to a file. If supplied, all
 #' downloaded layers are written to a single **GeoPackage** at this location.
 #' Extension is automatically forced to `.gpkg`.
+#' @param crs `numeric` or `character`; crs to convert layers to, see [sf::st_transform]
 #'
-#' @importFrom sf st_write
+#' @importFrom sf st_write st_transform
 #' @importFrom happign get_wfs
 #' @importFrom stats setNames
 #'
@@ -29,7 +30,7 @@
 #' save_to_gpkg <- get_georef_helpers(x, "road", "hydro", filename = gpkg)
 #' }
 #'
-get_georef_helpers <- function(x, ..., filename = NULL){
+get_georef_helpers <- function(x, ..., filename = NULL, crs = 3857){
   lookup <- list(
     "hydro" = c("BDTOPO_V3:noeud_hydrographique", "BDTOPO_V3:troncon_hydrographique", "BDTOPO_V3:plan_d_eau"),
     "road" = c("BDTOPO_V3:troncon_de_route", "BDTOPO_V3:troncon_de_voie_ferree"),
@@ -57,7 +58,7 @@ get_georef_helpers <- function(x, ..., filename = NULL){
 
   selected <- lookup[valid_cat] |> unlist(use.names = FALSE)
 
-  layers <- lapply(selected, \(layer) get_wfs(x, layer)) |>
+  layers <- lapply(selected, \(layer) get_wfs(x, layer) |> st_transform(crs)) |>
     setNames(gsub("BDTOPO_V3:","", selected))
   layers <- Filter(\(x) !is.null(x), layers)
 

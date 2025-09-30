@@ -4,7 +4,7 @@
 \alias{get_georef_helpers}
 \title{Download BDTOPO helper layers for manual georeferencing}
 \usage{
-get_georef_helpers(x, ..., filename = NULL)
+get_georef_helpers(x, ..., filename = NULL, crs = 3857)
 }
 \arguments{
 \item{x}{Object of class \code{sf} or \code{sfc}}
@@ -21,6 +21,8 @@ get_georef_helpers(x, ..., filename = NULL)
 \item{filename}{\code{character} or \code{NULL}; optional path to a file. If supplied, all
 downloaded layers are written to a single \strong{GeoPackage} at this location.
 Extension is automatically forced to \code{.gpkg}.}
+
+\item{crs}{\code{numeric} or \code{character}; crs to convert layers to, see \link[sf:st_transform]{sf::st_transform}}
 }
 \value{
 A \strong{named list} of \code{sf} objects.
