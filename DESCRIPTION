@@ -1,0 +1,21 @@
+Package: delorean
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person("Paul", "Carteron", , "carteronpaul@gmail.com", role = c("aut", "cre"))
+Description: Tools to search, download, and georeference french historical aerial 
+  photos from IGN.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Suggests: 
+    terra,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    gdalraster,
+    happign,
+    methods,
+    sf
+Depends: R (>= 4.1.0)
