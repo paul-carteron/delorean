@@ -13,6 +13,7 @@
 #'
 #' @importFrom sf st_write
 #' @importFrom happign get_wfs
+#' @importFrom stats setNames
 #'
 #' @export
 #' @return A **named list** of `sf` objects.
