@@ -1,7 +1,5 @@
 
-# delorean <img src="man/figures/logo.png" align="right" height="139" alt="" />
-
-# delorean
+# delorean <img src="man/figures/logo.png" align="right" height="138" alt="" />
 
 <!-- badges: start -->
 
