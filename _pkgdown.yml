@@ -1,12 +1,17 @@
-url: "https://paul-carteron.github.io/delorean"
-
+url: https://paul-carteron.github.io/delorean/
 template:
   bootstrap: 5
-  light-switch: true
+  light-switch: yes
   bslib:
     preset: bootstrap
-
 home:
   title: R access to IGN historical aerial photo
   sidebar:
-    structure: [dev, links, community, authors, license, citation]
+    structure:
+    - dev
+    - links
+    - community
+    - authors
+    - license
+    - citation
+
