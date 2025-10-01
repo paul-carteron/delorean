@@ -58,9 +58,10 @@ get_georef_helpers <- function(x, ..., filename = NULL, crs = 3857){
 
   selected <- lookup[valid_cat] |> unlist(use.names = FALSE)
 
-  layers <- lapply(selected, \(layer) get_wfs(x, layer) |> st_transform(crs)) |>
+  layers <- lapply(selected, \(layer) get_wfs(x, layer)) |>
     setNames(gsub("BDTOPO_V3:","", selected))
-  layers <- Filter(\(x) !is.null(x), layers)
+  layers <- Filter(\(x) !is.null(x), layers) |>
+    lapply(\(x) st_transform(x, crs))
 
   if (!is.null(filename)){
     force_gpkg <- paste0(tools::file_path_sans_ext(filename), ".gpkg")

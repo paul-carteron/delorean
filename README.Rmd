@@ -2,7 +2,7 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+# delorean <img src="man/figures/logo.png" align="right" height="139" alt="" />
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -17,39 +17,91 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/paul-carteron/delorean/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/paul-carteron/delorean/actions/workflows/R-CMD-check.yaml)
+[![CRAN status](https://www.r-pkg.org/badges/version/delorean)](https://CRAN.R-project.org/package=delorean)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-The goal of delorean is to ...
+The goal of `delorean` is to make it easy to explore, download and georeference french historical aerial photo from [Remonter le temps - IGN](https://remonterletemps.ign.fr/).
 
 ## Installation
 
-You can install the development version of delorean like so:
+You can install the development version of `delorean` like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+devtools::install_github("paul-carteron/delorean")
 ```
+## Usage
 
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
+```{r usage}
 library(delorean)
-## basic example code
+library(sf)
+library(terra)
+library(happign)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+### Explore
 
-```{r cars}
-summary(cars)
+`delorean` allows exploration of available aerial photos with `find_photos()`.
+It intersects the `bbox` of `x` (area of interest) with all photo footprints.
+Additional filters can be applied: `year`, `color`, and `oblique` (see `?delorean::find_photos`).
+
+```{r find_photos}
+x <- get_apicarto_cadastre("29158")
+all_photos <- find_photos(x)
+
+photos_1997 <- find_photos(x, year = 1997)
+
+plot(st_geometry(photos_1997), col = "grey90", border = "grey50", main = "1997 Photo footprints")
+plot(st_geometry(x), col = "firebrick", add = TRUE)
+
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
+### Download
 
-You can also embed plots, for example:
+For downloading, use `get_photos()` with the source returned by `find_photos()`.
+By default, the mode is set to `raw`, meaning the image has no spatial reference.
 
-```{r pressure, echo = FALSE}
-plot(pressure)
+```{r get_photos}
+# Using photo numero = 430 for the sake of example
+photo_1997 <- photos_1997[photos_1997$numero == 430, ]
+url <- photo_1997$url
+
+filepath <- get_photos(url, outdir = tempdir())
+photo <- rast(filepath)
+
+plot(photo)
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+### Georeference
+
+Historical photos from IGN are provided with a centroid, resolution, and orientation.
+From these, a default georeferencing can be performed — but be aware it is **significantly inaccurate** ! (as shown below).
+
+`get_photos()` offers two other modes: `gcp` and `warp`.
+The `gcp` mode only attaches Ground Control Points (GCPs), so the photo is georeferenced but not resampled onto a regular grid.
+The `warp` mode takes longer but resamples the photo to a grid, ensuring compatibility with most GIS software.
+
+```{r default_georef}
+filepath <- get_photos(url, outdir = "C:\\Users\\PaulCarteron\\Desktop\\temp\\dolorean", mode = "warp")
+photo <- rast(filepath)
+
+plot(photo)
+plot(project(vect(x), crs(photo)), border = "red", lwd = 2, add = T)
+```
+
+### Georeference Help
+
+Because the default georeferencing remains **significantly inaccurate**, `delorean` provides helpers to support manual georeferencing through the function `get_georef_helpers()`.
+This wrapper around `happign::get_wfs()` downloads prominent features that can assist in georeferencing, such as hydrological elements, infrastructure, roads, and buildings.
+All these layers are retrieved from IGN’s [BD TOPO® V3](https://geoservices.ign.fr/bdtopo) dataset.
+
+```{r georegf_helpers}
+georef_helpers <- get_georef_helpers(x, "infra", "other")
+
+plot(project(vect(x), crs(photo)), col = "grey90", border = "grey50", main = "Georef helpers on Penmarc'h")
+plot(vect(georef_helpers$construction_lineaire), lwd = 2, col = "forestgreen", add = TRUE)
+plot(vect(georef_helpers$construction_ponctuelle), col = "firebrick", add = TRUE)
+plot(vect(georef_helpers$point_de_repere), col = "royalblue", add = TRUE)
+
+```
+

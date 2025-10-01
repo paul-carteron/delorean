@@ -1,22 +1,3 @@
-#' Convert map scale to ground
-#'
-#' The constant `2.54` is used to convert inches to centimeters,
-#' since DPI (dots per inch) is expressed in inches while map
-#' scales are typically expressed per centimeter.
-#'
-#' By default `dpi = 1200`, which is the standard scanning
-#' used by IGN for digitizing historical aerial photos.
-#'
-#' @return A numeric value,  in meters per pixel.
-#'
-#' @noRd
-#'
-scale_to_res <- function(resolution, dpi) {
-  px_per_cm <- dpi / 2.54
-  m_per_px  <- (resolution / px_per_cm) * 0.01  # conversion cm -> m
-  return(m_per_px)
-}
-
 #' Build Ground Control Point arguments for GDAL georeferencing
 #'
 #' @param source `character`; Path or URL to the raster image.
@@ -24,9 +5,6 @@ scale_to_res <- function(resolution, dpi) {
 #' @param center_y `numeric`; Y coordinate of the photo’s center (map units).
 #' @param resolution `numeric`; Scale denominator (e.g. `20000` for 1:20000).
 #' @param orientation `numeric`; Orientation angle in degrees clockwise from North.
-#' @param dpi `numeric`; Scan  in dots per inch. Default is `1200`,
-#' which corresponds to the scanning standard for IGN’s historical
-#' aerial photo collection.
 #'
 #' @importFrom gdalraster GDALRaster translate warp
 #' @importFrom methods new
@@ -52,19 +30,31 @@ build_gcp_args <- function(
     source,
     center_x, center_y,
     resolution,
-    orientation,
-    dpi = 1200){
+    orientation){
 
   r <- new(GDALRaster, source, read_only = TRUE)
   nc <- r$getRasterXSize()
   nr <- r$getRasterYSize()
-  r$close
+  metadata <- r$getMetadata(band = 0, domain = "")
+  x_res <- as.numeric(sub(".*XRESOLUTION=([0-9.]+).*", "\\1", metadata[1]))
+  y_res <- as.numeric(sub(".*YRESOLUTION=([0-9.]+).*", "\\1", metadata[2]))
 
-  res_m <- scale_to_res(resolution, dpi)
-  half_w <- nc * res_m / 2
-  half_h <- nr * res_m / 2
+  black_in_rows <- vapply(c(nr/3, nr/2, 2 * nr/3), \(x){
+    vals <- r$read(band = 1, xoff = 0, yoff = floor(x), xsize = nc, ysize = 1, out_xsize = nc, out_ysize = 1)
+    black <- sum(vals == 0, na.rm = TRUE)
+  }, 0L) |> mean() |> floor()
 
-  theta <- (360 - orientation) * pi / 180
+  black_in_cols <- vapply(c(nc/3, nc/2, 2 * nc/3), \(x){
+    vals <- r$read(band = 1, xoff = floor(x), yoff = 0, xsize = 10, ysize = nr, out_xsize = 1, out_ysize = nr)
+    black <- sum(vals == 0, na.rm = TRUE)
+  }, 0L) |> mean() |> floor()
+
+  r$close()
+
+  half_w <- nc * (resolution / x_res) * 0.01 / 2 + max(black_in_rows, black_in_cols)
+  half_h <- nr * (resolution / y_res) * 0.01 / 2 + max(black_in_rows, black_in_cols)
+
+  theta <- (orientation - 180) * pi / 180
   M <- matrix(c(
     cos(theta), -sin(theta),
     sin(theta),  cos(theta)),
@@ -86,5 +76,6 @@ build_gcp_args <- function(
     "-gcp", as.character(nc), "0",   world$TR,
     "-gcp", as.character(nc), as.character(nr-1), world$BR
   )
+
   return(gcp_args)
 }

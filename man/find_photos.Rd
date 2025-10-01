@@ -4,13 +4,7 @@
 \alias{find_photos}
 \title{Retrieve image metadata}
 \usage{
-find_photos(
-  x,
-  year = NULL,
-  color = c("P", "C", "IR", "IRC"),
-  oblique = FALSE,
-  ...
-)
+find_photos(x, year = NULL, color = c("P", "C", "IR", "IRC"), oblique = FALSE)
 }
 \arguments{
 \item{x}{Object of class \code{sf} or \code{sfc}}
@@ -22,9 +16,8 @@ or range \code{1980:2990}. If \code{NULL} all years available are returned}
 \code{"IR"} (infra-red) or \code{"IRC"} (infra-red color). All by default.}
 
 \item{oblique}{\code{logical}; \code{FALSE} for \strong{vertical} aerial photos
-(camera pointing straight down), \code{TRUE} for \strong{oblique}  photos.}
-
-\item{...}{Other arg pass to \code{\link[happign:get_wfs]{happign::get_wfs()}}}
+(camera pointing straight down), \code{TRUE} for \strong{oblique}  photos. Use \code{NA}
+or \code{NULL} to retrieve both type.}
 }
 \value{
 \code{sf} with photo extent and metadata
@@ -41,12 +34,19 @@ them you can replace actual geometry with this one. See @examples.
 \dontrun{
 library(sf)
 x <- read_sf(system.file("extdata/penmarch.shp", package = "happign"))
-images_metadata <- get_image_metadata(x, year = 1969)
-images_centroid <- st_as_sf(
+images_metadata <- find_photos(x, year = 1969)
+
+# Access centroids
+centroid <- st_as_sf(
   st_drop_geometry(images_metadata),
   coords = c("x_3857", "y_3857"),
   crs = st_crs(3857)
 )
+centroid <- st_transform(centroid, 4326)
+
+plot(st_geometry(images_metadata[1,]), col = "grey80", border = "grey60", main = "Photo footprint and centroid")
+plot(st_geometry(images_centroid[1,]), col = "blue", pch = 20, add = TRUE)
+plot(st_geometry(x), col = "red", add = TRUE)
 }
 
 }

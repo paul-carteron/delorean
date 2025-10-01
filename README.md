@@ -1,52 +1,132 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+# delorean <img src="man/figures/logo.png" align="right" height="139" alt="" />
 
 # delorean
 
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/paul-carteron/delorean/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/paul-carteron/delorean/actions/workflows/R-CMD-check.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/delorean)](https://CRAN.R-project.org/package=delorean)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-The goal of delorean is to …
+The goal of `delorean` is to make it easy to explore, download and
+georeference french historical aerial photo from [Remonter le temps -
+IGN](https://remonterletemps.ign.fr/).
 
 ## Installation
 
-You can install the development version of delorean like so:
+You can install the development version of `delorean` like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+devtools::install_github("paul-carteron/delorean")
 ```
 
-## Example
-
-This is a basic example which shows you how to solve a common problem:
+## Usage
 
 ``` r
 library(delorean)
-## basic example code
+library(sf)
+#> Linking to GEOS 3.13.1, GDAL 3.11.0, PROJ 9.6.0; sf_use_s2() is TRUE
+library(terra)
+#> terra 1.8.70
+library(happign)
+#> Please make sure you have an internet connection.
+#> Use happign::get_last_news() to display latest geoservice news.
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+### Explore
+
+`delorean` allows exploration of available aerial photos with
+`find_photos()`. It intersects the `bbox` of `x` (area of interest) with
+all photo footprints. Additional filters can be applied: `year`,
+`color`, and `oblique` (see `?delorean::find_photos`).
 
 ``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
+x <- get_apicarto_cadastre("29158")
+all_photos <- find_photos(x)
+
+photos_1997 <- find_photos(x, year = 1997)
+
+plot(st_geometry(photos_1997), col = "grey90", border = "grey50", main = "1997 Photo footprints")
+plot(st_geometry(x), col = "firebrick", add = TRUE)
 ```
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
+<img src="man/figures/README-find_photos-1.png" width="100%" />
 
-You can also embed plots, for example:
+### Download
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
+For downloading, use `get_photos()` with the source returned by
+`find_photos()`. By default, the mode is set to `raw`, meaning the image
+has no spatial reference.
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+``` r
+# Using photo numero = 430 for the sake of example
+photo_1997 <- photos_1997[photos_1997$numero == 430, ]
+url <- photo_1997$url
+
+filepath <- get_photos(url, outdir = tempdir())
+#> Downloading [1/1] 0...10...20...30...40...50...60...70...80...90...100 - done.
+photo <- rast(filepath)
+#> Warning: [rast] unknown extent
+
+plot(photo)
+```
+
+<img src="man/figures/README-get_photos-1.png" width="100%" />
+
+### Georeference
+
+Historical photos from IGN are provided with a centroid, resolution, and
+orientation. From these, a default georeferencing can be performed — but
+be aware it is **significantly inaccurate** ! (as shown below).
+
+`get_photos()` offers two other modes: `gcp` and `warp`. The `gcp` mode
+only attaches Ground Control Points (GCPs), so the photo is
+georeferenced but not resampled onto a regular grid. The `warp` mode
+takes longer but resamples the photo to a grid, ensuring compatibility
+with most GIS software.
+
+``` r
+filepath <- get_photos(url, outdir = "C:\\Users\\PaulCarteron\\Desktop\\temp\\dolorean", mode = "warp")
+#> 
+#> 
+#> Downloading [1/1] 0...10...20...30...40...50...60...70...80...90...100 - done.
+#> Warping [1/1]
+#> Warning in .warp(src_datasets, dst_filename, list(), t_srs, cl_arg, quiet): GDAL FAILURE 1: Deleting C:\Users\PaulCarteron\Desktop\temp\dolorean/IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430.tif failed:
+#> Permission denied
+#> 0...10...20...30...40...50...60...70...80...90...100 - done.
+photo <- rast(filepath)
+
+plot(photo)
+plot(project(vect(x), crs(photo)), border = "red", lwd = 2, add = T)
+```
+
+<img src="man/figures/README-default_georef-1.png" width="100%" />
+
+### Georeference Help
+
+Because the default georeferencing remains **significantly inaccurate**,
+`delorean` provides helpers to support manual georeferencing through the
+function `get_georef_helpers()`. This wrapper around
+`happign::get_wfs()` downloads prominent features that can assist in
+georeferencing, such as hydrological elements, infrastructure, roads,
+and buildings. All these layers are retrieved from IGN’s [BD TOPO®
+V3](https://geoservices.ign.fr/bdtopo) dataset.
+
+``` r
+georef_helpers <- get_georef_helpers(x, "infra", "other")
+#> Features downloaded : 81
+#> Features downloaded : 32
+#> Warning: No data found, NULL is returned.
+#> Features downloaded : 19
+
+plot(project(vect(x), crs(photo)), col = "grey90", border = "grey50", main = "Georef helpers on Penmarc'h")
+plot(vect(georef_helpers$construction_lineaire), lwd = 2, col = "forestgreen", add = TRUE)
+plot(vect(georef_helpers$construction_ponctuelle), col = "firebrick", add = TRUE)
+plot(vect(georef_helpers$point_de_repere), col = "royalblue", add = TRUE)
+```
+
+<img src="man/figures/README-georegf_helpers-1.png" width="100%" />
