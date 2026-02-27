@@ -98,7 +98,8 @@
 <code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://paul-carteron.github.io/happign/reference/get_apicarto_cadastre.html" class="external-link">get_apicarto_cadastre</a></span><span class="op">(</span><span class="st">"29158"</span><span class="op">)</span></span>
 <span><span class="va">all_photos</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/find_photos.html">find_photos</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">photos_1997</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/find_photos.html">find_photos</a></span><span class="op">(</span><span class="va">x</span>, year <span class="op">=</span> <span class="fl">1997</span><span class="op">)</span></span>
+<span><span class="va">photos_1997</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/find_photos.html">find_photos</a></span><span class="op">(</span><span class="va">x</span>, year <span class="op">=</span> <span class="fl">1997</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">photos_1997</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"grey90"</span>, border <span class="op">=</span> <span class="st">"grey50"</span>, main <span class="op">=</span> <span class="st">"1997 Photo footprints"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"firebrick"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -114,8 +115,7 @@
 <span><span class="va">url</span> <span class="op">&lt;-</span> <span class="va">photo_1997</span><span class="op">$</span><span class="va">url</span></span>
 <span></span>
 <span><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_photos.html">get_photos</a></span><span class="op">(</span><span class="va">url</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif</span></span>
-<span><span class="co">#&gt; Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif</span></span>
+<span><span class="co">#&gt; ✔ Download complete.</span></span>
 <span><span class="va">photo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">photo</span><span class="op">)</span></span></code></pre></div>
@@ -128,10 +128,9 @@
 <p><code><a href="reference/get_photos.html">get_photos()</a></code> offers two other modes: <code>gcp</code> and <code>warp</code>. The <code>gcp</code> mode only attaches Ground Control Points (GCPs), so the photo is georeferenced but not resampled onto a regular grid. The <code>warp</code> mode takes longer but resamples the photo to a grid, ensuring compatibility with most GIS software.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_photos.html">get_photos</a></span><span class="op">(</span><span class="va">url</span>, mode <span class="op">=</span> <span class="st">"warp"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif</span></span>
-<span><span class="co">#&gt; Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif</span></span>
-<span><span class="co">#&gt; Skipping processing: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430.tif</span></span>
-<span><span class="co">#&gt; Skipping processing: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430.tif</span></span>
+<span><span class="co">#&gt; ℹ Processing [1/1]</span></span>
+<span><span class="co">#&gt; 0...10...20...30...40...50...60...70...80...90...100 - done.</span></span>
+<span><span class="co">#&gt; 0...10...20...30...40...50...60...70...80...90...100 - done.</span></span>
 <span><span class="va">photo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">photo</span><span class="op">)</span></span>
