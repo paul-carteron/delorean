@@ -9,10 +9,10 @@
 #' \dontrun{
 #' library(happign)
 #' x <- get_apicarto_cadastre("29158")
-#' photos <- plot_years(x)
+#' photos <- plot_photos(x)
 #' }
 #'
-plot_years <- function(x) {
+plot_photos <- function(x) {
   photos <- find_photos(x)
   photo$years <- as.numeric(format(photo$date_cliche, "%Y"))
 
@@ -23,17 +23,17 @@ plot_years <- function(x) {
                      main = "Number of photo by year",
                      type = "barplot",
                      xaxt = "n",
-                     xlab = "Year",
+                     xlab = "",
                      palette = "Dark2",
                      ylab = "",
-                     legend = tinyplot::legend("bottom!", title = "Photo type"))
+                     legend = graphics::legend("bottom!", title = "Photo type"))
 
-    tinyplot::text(
+    graphics::text(
       seq_along(years), 0, labels = years, srt = 75,
       adj = c(1.2, 0.5), xpd = TRUE, cex = 1.1
     )
 
-    tinyplot::text(
+    graphics::text(
       x = seq_along(years),
       y = as.numeric(table(photos$year)),
       labels = as.numeric(table(photos$year)),
