@@ -2,18 +2,18 @@
 
 ## Authors
 
-- **Paul Carteron**. Author, maintainer.
+- **Paul Carteron**. Author, maintainer, copyright holder.
 
 ## Citation
 
-Carteron P (2026). *delorean: What the Package Does (One Line, Title
-Case)*. R package version 0.0.0.9000,
+Carteron P (2026). *delorean: Access to French IGN Historical Aerial
+Photographs*. R package version 1.0.0,
 <https://paul-carteron.github.io/delorean/>.
 
     @Manual{,
-      title = {delorean: What the Package Does (One Line, Title Case)},
+      title = {delorean: Access to French IGN Historical Aerial Photographs},
       author = {Paul Carteron},
       year = {2026},
-      note = {R package version 0.0.0.9000},
+      note = {R package version 1.0.0},
       url = {https://paul-carteron.github.io/delorean/},
     }
