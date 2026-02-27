@@ -74,12 +74,22 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://paul-carteron.github.io/delorean/">delorean</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Linking to GEOS 3.13.1, GDAL 3.11.0, PROJ 9.6.0; sf_use_s2() is TRUE</span></span>
+<span><span class="co">#&gt; Warning: le package 'sf' a été compilé avec la version R 4.5.2</span></span>
+<span><span class="co">#&gt; Linking to GEOS 3.13.1, GDAL 3.11.4, PROJ 9.7.0; sf_use_s2() is TRUE</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; terra 1.8.70</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/paul-carteron" class="external-link">happign</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: le package 'terra' a été compilé avec la version R 4.5.2</span></span>
+<span><span class="co">#&gt; terra 1.8.93</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://paul-carteron.github.io/happign/" class="external-link">happign</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Please make sure you have an internet connection.</span></span>
-<span><span class="co">#&gt; Use happign::get_last_news() to display latest geoservice news.</span></span></code></pre></div>
+<span><span class="co">#&gt; Use happign::get_last_news() to display latest geoservice news.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attachement du package : 'happign'</span></span>
+<span><span class="co">#&gt; L'objet suivant est masqué depuis 'package:terra':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     relate</span></span>
+<span><span class="co">#&gt; L'objet suivant est masqué depuis 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     within</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="explore">Explore<a class="anchor" aria-label="anchor" href="#explore"></a>
 </h3>
@@ -92,7 +102,7 @@
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">photos_1997</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"grey90"</span>, border <span class="op">=</span> <span class="st">"grey50"</span>, main <span class="op">=</span> <span class="st">"1997 Photo footprints"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"firebrick"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-find_photos-1.png" width="100%"></p>
+<p><img src="reference/figures/README-find_photos-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="download">Download<a class="anchor" aria-label="anchor" href="#download"></a>
@@ -103,13 +113,13 @@
 <span><span class="va">photo_1997</span> <span class="op">&lt;-</span> <span class="va">photos_1997</span><span class="op">[</span><span class="va">photos_1997</span><span class="op">$</span><span class="va">numero</span> <span class="op">==</span> <span class="fl">430</span>, <span class="op">]</span></span>
 <span><span class="va">url</span> <span class="op">&lt;-</span> <span class="va">photo_1997</span><span class="op">$</span><span class="va">url</span></span>
 <span></span>
-<span><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_photos.html">get_photos</a></span><span class="op">(</span><span class="va">url</span>, outdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Downloading [1/1] 0...10...20...30...40...50...60...70...80...90...100 - done.</span></span>
+<span><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_photos.html">get_photos</a></span><span class="op">(</span><span class="va">url</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif</span></span>
+<span><span class="co">#&gt; Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif</span></span>
 <span><span class="va">photo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: [rast] unknown extent</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">photo</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-get_photos-1.png" width="100%"></p>
+<p><img src="reference/figures/README-get_photos-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="georeference">Georeference<a class="anchor" aria-label="anchor" href="#georeference"></a>
@@ -117,19 +127,16 @@
 <p>Historical photos from IGN are provided with a centroid, resolution, and orientation. From these, a default georeferencing can be performed — but be aware it is <strong>significantly inaccurate</strong> ! (as shown below).</p>
 <p><code><a href="reference/get_photos.html">get_photos()</a></code> offers two other modes: <code>gcp</code> and <code>warp</code>. The <code>gcp</code> mode only attaches Ground Control Points (GCPs), so the photo is georeferenced but not resampled onto a regular grid. The <code>warp</code> mode takes longer but resamples the photo to a grid, ensuring compatibility with most GIS software.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_photos.html">get_photos</a></span><span class="op">(</span><span class="va">url</span>, outdir <span class="op">=</span> <span class="st">"C:\\Users\\PaulCarteron\\Desktop\\temp\\dolorean"</span>, mode <span class="op">=</span> <span class="st">"warp"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Downloading [1/1] 0...10...20...30...40...50...60...70...80...90...100 - done.</span></span>
-<span><span class="co">#&gt; Warping [1/1]</span></span>
-<span><span class="co">#&gt; Warning in .warp(src_datasets, dst_filename, list(), t_srs, cl_arg, quiet): GDAL FAILURE 1: Deleting C:\Users\PaulCarteron\Desktop\temp\dolorean/IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430.tif failed:</span></span>
-<span><span class="co">#&gt; Permission denied</span></span>
-<span><span class="co">#&gt; 0...10...20...30...40...50...60...70...80...90...100 - done.</span></span>
+<code class="sourceCode R"><span><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_photos.html">get_photos</a></span><span class="op">(</span><span class="va">url</span>, mode <span class="op">=</span> <span class="st">"warp"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif</span></span>
+<span><span class="co">#&gt; Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif</span></span>
+<span><span class="co">#&gt; Skipping processing: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430.tif</span></span>
+<span><span class="co">#&gt; Skipping processing: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430.tif</span></span>
 <span><span class="va">photo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">photo</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/project.html" class="external-link">project</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">photo</span><span class="op">)</span><span class="op">)</span>, border <span class="op">=</span> <span class="st">"red"</span>, lwd <span class="op">=</span> <span class="fl">2</span>, add <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-default_georef-1.png" width="100%"></p>
+<p><img src="reference/figures/README-default_georef-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="georeference-help">Georeference Help<a class="anchor" aria-label="anchor" href="#georeference-help"></a>
@@ -137,16 +144,12 @@
 <p>Because the default georeferencing remains <strong>significantly inaccurate</strong>, <code>delorean</code> provides helpers to support manual georeferencing through the function <code><a href="reference/get_georef_helpers.html">get_georef_helpers()</a></code>. This wrapper around <code><a href="https://paul-carteron.github.io/happign/reference/get_wfs.html" class="external-link">happign::get_wfs()</a></code> downloads prominent features that can assist in georeferencing, such as hydrological elements, infrastructure, roads, and buildings. All these layers are retrieved from IGN’s <a href="https://geoservices.ign.fr/bdtopo" class="external-link">BD TOPO® V3</a> dataset.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">georef_helpers</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_georef_helpers.html">get_georef_helpers</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"infra"</span>, <span class="st">"other"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Features downloaded : 81</span></span>
-<span><span class="co">#&gt; Features downloaded : 32</span></span>
-<span><span class="co">#&gt; Warning: No data found, NULL is returned.</span></span>
-<span><span class="co">#&gt; Features downloaded : 19</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/project.html" class="external-link">project</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">photo</span><span class="op">)</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"grey90"</span>, border <span class="op">=</span> <span class="st">"grey50"</span>, main <span class="op">=</span> <span class="st">"Georef helpers on Penmarc'h"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">georef_helpers</span><span class="op">$</span><span class="va">construction_lineaire</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"forestgreen"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">georef_helpers</span><span class="op">$</span><span class="va">construction_ponctuelle</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"firebrick"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">georef_helpers</span><span class="op">$</span><span class="va">point_de_repere</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"royalblue"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-georegf_helpers-1.png" width="100%"></p>
+<p><img src="reference/figures/README-georegf_helpers-1.png" alt="" width="100%"></p>
 </div>
 </div>
 </div>
@@ -191,7 +194,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
