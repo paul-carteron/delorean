@@ -29,21 +29,22 @@
 #'
 #' @seealso [curl::multi_download()]
 #'
-#' @returns `character`; filepaths of each photos
-#'
-#' @export
+#' @return `character`; filepaths of each photos
 #'
 #' @examples
-#' \dontrun{
+#' {
 #' library(sf)
 #' library(terra)
+#'
 #' x <- read_sf(system.file("extdata/penmarch.shp", package = "happign"))
+#'
 #' image_metadata <- find_photos(x, 1969)
-#' tmp <- tempdir()
-#' photo <- get_photos(image_metadata$url[1], tmp)
+#' photo <- get_photos(image_metadata$url[1], outdir = tempdir())
 #'
 #' plot(rast(photo))
 #' }
+#'
+#' @export
 get_photos <- function(
     source,
     outdir = NULL,

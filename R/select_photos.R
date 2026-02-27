@@ -23,17 +23,16 @@
 #'
 #' @examples
 #' \dontrun{
-#' x <- sf::read_sf("my_area.gpkg")
+#' x <- read_sf(system.file("extdata/penmarch.shp", package = "happign"))
 #' photos <- find_photos(x)
 #'
-#' sel <- select_photos(photos)
+#' selection <- select_photos(photos)
 #'
 #' # Then download:
-#' get_photos(sel$url, outdir = tempdir(), mode = "raw")
+#' get_photos(selection$url, outdir = tempdir(), mode = "raw")
 #' }
 #'
 #' @export
-
 select_photos <- function(photos, outdir = NULL) {
 
   # Normalize to factors for stable menus

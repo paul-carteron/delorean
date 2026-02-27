@@ -16,20 +16,27 @@
 #' @importFrom happign get_wfs
 #' @importFrom stats setNames
 #'
-#' @export
 #' @return A **named list** of `sf` objects.
 #'
 #' @examples
-#' \dontrun{
+#' {
 #' library(sf)
-#' x <- read_sf(system.file("extdata/penmarch.shp", package = "happign"))
-#' hydro <- get_georef_helpers(x, "hydro")
-#' all <- get_georef_helpers(x)
+#' library(happign)
 #'
+#' x <- get_apicarto_cadastre(29158)
+#' georef <- get_georef_helpers(x, "hydro", crs = st_crs(x))
+#'
+#' plot(st_geometry(x))
+#' plot(st_geometry(georef[[1]]), col = "blue", add = TRUE)
+#' plot(st_geometry(georef[[2]]), col = "steelblue", add = TRUE)
+#' plot(st_geometry(georef[[3]]), col = "darkblue", add = TRUE)
+#'
+#' # Direct save to gpkg for gis georeferencing
 #' gpkg <- tempfile(fileext = ".gpkg")
 #' save_to_gpkg <- get_georef_helpers(x, "road", "hydro", filename = gpkg)
 #' }
 #'
+#' @export
 get_georef_helpers <- function(x, ..., filename = NULL, crs = 3857){
   lookup <- list(
     "hydro" = c("BDTOPO_V3:noeud_hydrographique", "BDTOPO_V3:troncon_hydrographique", "BDTOPO_V3:plan_d_eau"),
@@ -70,6 +77,6 @@ get_georef_helpers <- function(x, ..., filename = NULL, crs = 3857){
     }
   }
 
-  return(layers)
+  return(invisible(layers))
 }
 

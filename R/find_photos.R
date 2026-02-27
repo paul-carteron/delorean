@@ -17,14 +17,14 @@
 #' are contained in the dataset as the form of `x_3857`, `y_3857`. To leverage
 #' them you can replace actual geometry with this one. See @examples.
 #'
-#' @returns `sf` with photo extent and metadata
-#' @export
+#' @return `sf` with photo extent and metadata
 #'
 #' @examples
-#' \dontrun{
+#' {
 #' library(sf)
-#' x <- read_sf(system.file("extdata/penmarch.shp", package = "happign"))
-#' images_metadata <- find_photos(x, year = 1969)
+#' x <- read_sf(system.file("extdata/penmarch.shp", package = "happign")) |>
+#'   st_transform(4326)
+#' images_metadata <- find_photos(x, year = 1969) |> st_transform(4326)
 #'
 #' # Access centroids
 #' centroid <- st_as_sf(
@@ -35,7 +35,7 @@
 #' centroid <- st_transform(centroid, 4326)
 #'
 #' plot(
-#'   st_geometry(images_metadata[1,]),
+#'   st_geometry(images_metadata[1,]) ,
 #'   col = "grey80", border = "grey60",
 #'   main = "Photo footprint and centroid"
 #'  )
@@ -43,6 +43,7 @@
 #' plot(st_geometry(x), col = "red", add = TRUE)
 #' }
 #'
+#' @export
 find_photos <- function(x, year = NULL, color = c("P", "C", "IR", "IRC"), oblique = FALSE){
 
   check_find_photos(x, year, color, oblique)

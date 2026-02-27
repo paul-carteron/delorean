@@ -2,11 +2,11 @@
 #'
 #' @param x Object of class `sf` or `sfc`
 #'
-#' @returns data.frame
+#' @return data.frame
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' {
 #' library(happign)
 #' x <- get_apicarto_cadastre("29158")
 #' photos <- plot_photos(x)
@@ -14,11 +14,11 @@
 #'
 plot_photos <- function(x) {
   photos <- find_photos(x)
-  photo$years <- as.numeric(format(photo$date_cliche, "%Y"))
+  photos$years <- as.numeric(format(photos$date_cliche, "%Y"))
 
   years <- sort(unique(photos$year))
   tinyplot::tinytheme("clean2", mar = c(5, 4, 5, 2))
-  tinyplot::tinyplot(~ year | couleur,
+  tinyplot::tinyplot(~ years | couleur,
                      data = photos,
                      main = "Number of photo by year",
                      type = "barplot",
