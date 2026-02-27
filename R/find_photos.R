@@ -64,6 +64,7 @@ find_photos <- function(x, year = NULL, color = c("P", "C", "IR", "IRC"), obliqu
     image <- image[format(image$date_cliche, "%Y") %in% as.character(year), ]
   }
 
+  image <- unique(image)
   if (nrow(image) == 0){
     cli::cli_warn("No data found, {.val NULL} is returned")
     return(NULL)

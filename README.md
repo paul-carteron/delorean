@@ -56,7 +56,8 @@ all photo footprints. Additional filters can be applied: `year`,
 x <- get_apicarto_cadastre("29158")
 all_photos <- find_photos(x)
 
-photos_1997 <- find_photos(x, year = 1997)
+photos_1997 <- find_photos(x, year = 1997) |> 
+  st_transform(st_crs(x))
 
 plot(st_geometry(photos_1997), col = "grey90", border = "grey50", main = "1997 Photo footprints")
 plot(st_geometry(x), col = "firebrick", add = TRUE)
@@ -76,8 +77,7 @@ photo_1997 <- photos_1997[photos_1997$numero == 430, ]
 url <- photo_1997$url
 
 filepath <- get_photos(url)
-#> Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif
-#> Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif
+#> ✔ Download complete.
 photo <- rast(filepath)
 
 plot(photo)
@@ -99,10 +99,9 @@ with most GIS software.
 
 ``` r
 filepath <- get_photos(url, mode = "warp")
-#> Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif
-#> Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif
-#> Skipping processing: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430.tif
-#> Skipping processing: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430.tif
+#> ℹ Processing [1/1]
+#> 0...10...20...30...40...50...60...70...80...90...100 - done.
+#> 0...10...20...30...40...50...60...70...80...90...100 - done.
 photo <- rast(filepath)
 
 plot(photo)

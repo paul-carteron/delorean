@@ -43,11 +43,12 @@ library(happign)
 It intersects the `bbox` of `x` (area of interest) with all photo footprints.
 Additional filters can be applied: `year`, `color`, and `oblique` (see `?delorean::find_photos`).
 
-```{r find_photos, message=FALSE, warning=FALSE}
+```{r find_photos}
 x <- get_apicarto_cadastre("29158")
 all_photos <- find_photos(x)
 
-photos_1997 <- find_photos(x, year = 1997)
+photos_1997 <- find_photos(x, year = 1997) |> 
+  st_transform(st_crs(x))
 
 plot(st_geometry(photos_1997), col = "grey90", border = "grey50", main = "1997 Photo footprints")
 plot(st_geometry(x), col = "firebrick", add = TRUE)
