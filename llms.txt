@@ -39,9 +39,8 @@ library(happign)
 
 `delorean` allows exploration of available aerial photos with
 [`find_photos()`](https://paul-carteron.github.io/delorean/reference/find_photos.md).
-It intersects the `bbox` of `x` (area of interest) with all photo
-footprints. Additional filters can be applied: `year`, `color`, and
-`oblique` (see
+It intersects `x` (area of interest) with all photo footprints.
+Additional filters can be applied: `year`, `color`, and `oblique` (see
 [`?delorean::find_photos`](https://paul-carteron.github.io/delorean/reference/find_photos.md)).
 
 ``` r
@@ -55,7 +54,15 @@ plot(st_geometry(photos_1997), col = "grey90", border = "grey50", main = "1997 P
 plot(st_geometry(x), col = "firebrick", add = TRUE)
 ```
 
-![](reference/figures/README-find_photos-1.png)
+![](reference/figures/README-find_photos-1.png) To get an overview of
+all available photographs for a given area, plot_photos(x) generates a
+bar chart summarizing the number of images by year and color type
+
+``` r
+plot_photos(x)
+```
+
+![](reference/figures/README-plot_photos-1.png)
 
 ### Download
 
@@ -96,8 +103,6 @@ software.
 ``` r
 filepath <- get_photos(url, mode = "warp")
 #> ℹ Processing [1/1]
-#> 0...10...20...30...40...50...60...70...80...90...100 - done.
-#> 0...10...20...30...40...50...60...70...80...90...100 - done.
 photo <- rast(filepath)
 
 plot(photo)

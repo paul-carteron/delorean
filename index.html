@@ -94,7 +94,7 @@
 <div class="section level3">
 <h3 id="explore">Explore<a class="anchor" aria-label="anchor" href="#explore"></a>
 </h3>
-<p><code>delorean</code> allows exploration of available aerial photos with <code><a href="reference/find_photos.html">find_photos()</a></code>. It intersects the <code>bbox</code> of <code>x</code> (area of interest) with all photo footprints. Additional filters can be applied: <code>year</code>, <code>color</code>, and <code>oblique</code> (see <code><a href="reference/find_photos.html">?delorean::find_photos</a></code>).</p>
+<p><code>delorean</code> allows exploration of available aerial photos with <code><a href="reference/find_photos.html">find_photos()</a></code>. It intersects <code>x</code> (area of interest) with all photo footprints. Additional filters can be applied: <code>year</code>, <code>color</code>, and <code>oblique</code> (see <code><a href="reference/find_photos.html">?delorean::find_photos</a></code>).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://paul-carteron.github.io/happign/reference/get_apicarto_cadastre.html" class="external-link">get_apicarto_cadastre</a></span><span class="op">(</span><span class="st">"29158"</span><span class="op">)</span></span>
 <span><span class="va">all_photos</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/find_photos.html">find_photos</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
@@ -104,13 +104,16 @@
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">photos_1997</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"grey90"</span>, border <span class="op">=</span> <span class="st">"grey50"</span>, main <span class="op">=</span> <span class="st">"1997 Photo footprints"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"firebrick"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-find_photos-1.png" alt="" width="100%"></p>
+<p><img src="reference/figures/README-find_photos-1.png" alt="" width="100%"> To get an overview of all available photographs for a given area, plot_photos(x) generates a bar chart summarizing the number of images by year and color type</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_photos.html">plot_photos</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-plot_photos-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="download">Download<a class="anchor" aria-label="anchor" href="#download"></a>
 </h3>
 <p>For downloading, use <code><a href="reference/get_photos.html">get_photos()</a></code> with the source returned by <code><a href="reference/find_photos.html">find_photos()</a></code>. By default, the mode is set to <code>raw</code>, meaning the image has no spatial reference.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Using photo numero = 430 for the sake of example</span></span>
 <span><span class="va">photo_1997</span> <span class="op">&lt;-</span> <span class="va">photos_1997</span><span class="op">[</span><span class="va">photos_1997</span><span class="op">$</span><span class="va">numero</span> <span class="op">==</span> <span class="fl">430</span>, <span class="op">]</span></span>
 <span><span class="va">url</span> <span class="op">&lt;-</span> <span class="va">photo_1997</span><span class="op">$</span><span class="va">url</span></span>
@@ -127,11 +130,9 @@
 </h3>
 <p>Historical photos from IGN are provided with a centroid, resolution, and orientation. From these, a default georeferencing can be performed — but be aware it is <strong>significantly inaccurate</strong> ! (as shown below).</p>
 <p><code><a href="reference/get_photos.html">get_photos()</a></code> offers two other modes: <code>gcp</code> and <code>warp</code>. The <code>gcp</code> mode only attaches Ground Control Points (GCPs), so the photo is georeferenced but not resampled onto a regular grid. The <code>warp</code> mode takes longer but resamples the photo to a grid, ensuring compatibility with most GIS software.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">filepath</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_photos.html">get_photos</a></span><span class="op">(</span><span class="va">url</span>, mode <span class="op">=</span> <span class="st">"warp"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ℹ Processing [1/1]</span></span>
-<span><span class="co">#&gt; 0...10...20...30...40...50...60...70...80...90...100 - done.</span></span>
-<span><span class="co">#&gt; 0...10...20...30...40...50...60...70...80...90...100 - done.</span></span>
 <span><span class="va">photo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="va">filepath</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">photo</span><span class="op">)</span></span>
@@ -142,7 +143,7 @@
 <h3 id="georeference-help">Georeference Help<a class="anchor" aria-label="anchor" href="#georeference-help"></a>
 </h3>
 <p>Because the default georeferencing remains <strong>significantly inaccurate</strong>, <code>delorean</code> provides helpers to support manual georeferencing through the function <code><a href="reference/get_georef_helpers.html">get_georef_helpers()</a></code>. This wrapper around <code><a href="https://paul-carteron.github.io/happign/reference/get_wfs.html" class="external-link">happign::get_wfs()</a></code> downloads prominent features that can assist in georeferencing, such as hydrological elements, infrastructure, roads, and buildings. All these layers are retrieved from IGN’s <a href="https://geoservices.ign.fr/bdtopo" class="external-link">BD TOPO® V3</a> dataset.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">georef_helpers</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_georef_helpers.html">get_georef_helpers</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"infra"</span>, <span class="st">"other"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/project.html" class="external-link">project</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">photo</span><span class="op">)</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"grey90"</span>, border <span class="op">=</span> <span class="st">"grey50"</span>, main <span class="op">=</span> <span class="st">"Georef helpers on Penmarc'h"</span><span class="op">)</span></span>
