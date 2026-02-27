@@ -32,7 +32,7 @@ build_gcp_args <- function(
     resolution,
     orientation){
 
-  r <- new(GDALRaster, source, read_only = TRUE)
+  r <- methods::new(GDALRaster, source, read_only = TRUE)
   nc <- r$getRasterXSize()
   nr <- r$getRasterYSize()
   metadata <- r$getMetadata(band = 0, domain = "")
@@ -79,3 +79,4 @@ build_gcp_args <- function(
 
   return(gcp_args)
 }
+

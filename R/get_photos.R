@@ -41,62 +41,99 @@
 #'
 #' plot(rast(photo))
 #' }
-get_photos <- function(source, outdir = NULL, mode = "raw", quiet = FALSE, overwrite = TRUE){
+get_photos <- function(source, outdir = NULL, mode = "raw", quiet = FALSE, overwrite = FALSE){
 
   if (is.null(outdir)){
     outdir <- tools::R_user_dir("delorean", "cache")
   }
 
-  try_georef <- mode %in% c("gcp", "warp")
-  if (try_georef) {
-    metadata <- reverse_url_metadata(source)
+  if (!dir.exists(outdir)) {
+    dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
   }
 
   n <- length(source)
-  files <- character(n)
-
-  for (i in seq_along(source)) {
+  raw_files <- character(n)
+  h <- curl::new_handle()
+  for (i in seq_along(source)){
     ids <- url_parser(source[i])
-    filename <- paste0(ids$image_identifier, ".tif")
+    filename <- paste0(ids$image_identifier, "_raw.tif")
     filepath <- file.path(outdir, filename)
 
     if (file.exists(filepath) && !overwrite) {
-      if (!quiet) message("Skipping ", filename)
+      if (!quiet) message("Already downloaded: ", basename(filepath))
+      raw_files[i] <- filepath
+      next
+    }
+
+    if (!quiet) message(sprintf("Downloading [%d/%d] ", i, n))
+    curl::curl_download(source[i], filepath, quiet = quiet, handle = h)
+    raw_files[i] <- filepath
+  }
+
+  if (mode == "raw") {
+    return(invisible(raw_files))
+  }
+
+  files <- character(n)
+  source_metadata <- reverse_url_metadata(source)
+  for (i in seq_along(raw_files)){
+    raw_path <- raw_files[i]
+    ids <- url_parser(source[i])
+    final_path <- file.path(outdir, paste0(ids$image_identifier, ".tif"))
+
+    if (file.exists(final_path) && !overwrite) {
+      if (!quiet) message("Skipping processing: ", basename(final_path))
       files[i] <- filepath
       next
     }
 
-    if (!quiet) cat(sprintf("Downloading [%d/%d] ", i, n))
-    args <- c("-of", "GTiff", "-co", "COMPRESS=LZW", "-co", "TILED=YES")
+    if (!quiet) message(sprintf("Processing [%d/%d] ", i, n))
 
-    if (try_georef) {
-      gcp_args <- build_gcp_args(
-        source = metadata$url[i],
-        center_x = metadata$x[i],
-        center_y = metadata$y[i],
-        resolution = metadata$resolution[i],
-        orientation = metadata$orientation[i]
-      )
-      args <- c(args, "-a_srs", "EPSG:3857", gcp_args)
-    }
+    gcp_args <- build_gcp_args(
+      source = raw_path,
+      center_x = source_metadata$x[i],
+      center_y = source_metadata$y[i],
+      resolution = source_metadata$resolution[i],
+      orientation = source_metadata$orientation[i]
+    )
 
-    out <- if (mode == "warp") tempfile(fileext = ".vrt") else filepath
-    translate(source[i], out, cl_arg = args, quiet = quiet)
+    tmp_path <- tempfile(fileext = ".tif")
 
-    if (mode == "warp"){
-      args_warp <- c(
-        "-order", "1",
-        "-r", "bilinear",
+    gdalraster::translate(
+      raw_path,
+      tmp_path,
+      cl_arg = c(
+        "-a_srs", "EPSG:3857",
+        gcp_args,
         "-co", "COMPRESS=LZW",
         "-co", "TILED=YES"
+      ),
+      quiet = quiet
+    )
+
+    if (mode == "warp") {
+
+      gdalraster::warp(
+        tmp_path,
+        final_path,
+        t_srs = "EPSG:3857",
+        cl_arg = c(
+          "-order", "1",
+          "-r", "bilinear",
+          "-co", "COMPRESS=LZW",
+          "-co", "TILED=YES"
+        ),
+        quiet = quiet
       )
-      if (!quiet) cat(sprintf("Warping [%d/%d] ", i, n))
-      warp(out, filepath, t_srs = "EPSG:3857", cl_arg = args_warp)
+
+      unlink(tmp_path)
+
+    } else {
+      file.rename(tmp_path, final_path)
     }
 
-    files[i] <- filepath
-
+    files[i] <- final_path
   }
 
-  return(invisible(files))
+  return(invisible(final_path))
 }

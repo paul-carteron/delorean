@@ -27,12 +27,22 @@ devtools::install_github("paul-carteron/delorean")
 ``` r
 library(delorean)
 library(sf)
-#> Linking to GEOS 3.13.1, GDAL 3.11.0, PROJ 9.6.0; sf_use_s2() is TRUE
+#> Warning: le package 'sf' a été compilé avec la version R 4.5.2
+#> Linking to GEOS 3.13.1, GDAL 3.11.4, PROJ 9.7.0; sf_use_s2() is TRUE
 library(terra)
-#> terra 1.8.70
+#> Warning: le package 'terra' a été compilé avec la version R 4.5.2
+#> terra 1.8.93
 library(happign)
 #> Please make sure you have an internet connection.
 #> Use happign::get_last_news() to display latest geoservice news.
+#> 
+#> Attachement du package : 'happign'
+#> L'objet suivant est masqué depuis 'package:terra':
+#> 
+#>     relate
+#> L'objet suivant est masqué depuis 'package:base':
+#> 
+#>     within
 ```
 
 ### Explore
@@ -52,7 +62,7 @@ plot(st_geometry(photos_1997), col = "grey90", border = "grey50", main = "1997 P
 plot(st_geometry(x), col = "firebrick", add = TRUE)
 ```
 
-<img src="man/figures/README-find_photos-1.png" width="100%" />
+<img src="man/figures/README-find_photos-1.png" alt="" width="100%" />
 
 ### Download
 
@@ -65,15 +75,15 @@ has no spatial reference.
 photo_1997 <- photos_1997[photos_1997$numero == 430, ]
 url <- photo_1997$url
 
-filepath <- get_photos(url, outdir = tempdir())
-#> Downloading [1/1] 0...10...20...30...40...50...60...70...80...90...100 - done.
+filepath <- get_photos(url)
+#> Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif
+#> Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif
 photo <- rast(filepath)
-#> Warning: [rast] unknown extent
 
 plot(photo)
 ```
 
-<img src="man/figures/README-get_photos-1.png" width="100%" />
+<img src="man/figures/README-get_photos-1.png" alt="" width="100%" />
 
 ### Georeference
 
@@ -88,21 +98,18 @@ takes longer but resamples the photo to a grid, ensuring compatibility
 with most GIS software.
 
 ``` r
-filepath <- get_photos(url, outdir = "C:\\Users\\PaulCarteron\\Desktop\\temp\\dolorean", mode = "warp")
-#> 
-#> 
-#> Downloading [1/1] 0...10...20...30...40...50...60...70...80...90...100 - done.
-#> Warping [1/1]
-#> Warning in .warp(src_datasets, dst_filename, list(), t_srs, cl_arg, quiet): GDAL FAILURE 1: Deleting C:\Users\PaulCarteron\Desktop\temp\dolorean/IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430.tif failed:
-#> Permission denied
-#> 0...10...20...30...40...50...60...70...80...90...100 - done.
+filepath <- get_photos(url, mode = "warp")
+#> Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif
+#> Already downloaded: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430_raw.tif
+#> Skipping processing: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430.tif
+#> Skipping processing: IGNF_PVA_1-0__1997-04-10__CA97S00621_1997_F0517-0520_0430.tif
 photo <- rast(filepath)
 
 plot(photo)
 plot(project(vect(x), crs(photo)), border = "red", lwd = 2, add = T)
 ```
 
-<img src="man/figures/README-default_georef-1.png" width="100%" />
+<img src="man/figures/README-default_georef-1.png" alt="" width="100%" />
 
 ### Georeference Help
 
@@ -116,10 +123,6 @@ V3](https://geoservices.ign.fr/bdtopo) dataset.
 
 ``` r
 georef_helpers <- get_georef_helpers(x, "infra", "other")
-#> Features downloaded : 81
-#> Features downloaded : 32
-#> Warning: No data found, NULL is returned.
-#> Features downloaded : 19
 
 plot(project(vect(x), crs(photo)), col = "grey90", border = "grey50", main = "Georef helpers on Penmarc'h")
 plot(vect(georef_helpers$construction_lineaire), lwd = 2, col = "forestgreen", add = TRUE)
@@ -127,4 +130,4 @@ plot(vect(georef_helpers$construction_ponctuelle), col = "firebrick", add = TRUE
 plot(vect(georef_helpers$point_de_repere), col = "royalblue", add = TRUE)
 ```
 
-<img src="man/figures/README-georegf_helpers-1.png" width="100%" />
+<img src="man/figures/README-georegf_helpers-1.png" alt="" width="100%" />

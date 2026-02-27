@@ -44,7 +44,7 @@ reverse_url_metadata <- function(urls){
     "dataset_identifier IN (%s)",
     paste0("'", dataset_identifier, "'", collapse = ", ")
   )
-  mission <- get_wfs(x = NULL, "pva:dataset", ecql_filter = dataset_filter) |>
+  mission <- get_wfs(x = NULL, "pva:dataset", query = dataset_filter) |>
     st_drop_geometry() |>
     suppressMessages()
 
@@ -53,7 +53,7 @@ reverse_url_metadata <- function(urls){
     "image_identifier IN (%s)",
     paste0("'", image_identifier, "'", collapse = ", ")
   )
-  metadata <- get_wfs(x = NULL, "pva:image", ecql_filter = image_filter) |>
+  metadata <- get_wfs(x = NULL, "pva:image", query = image_filter) |>
     st_drop_geometry() |>
     merge(mission[, c("dataset_identifier", "resolution")]) |>
     transform(url = urls) |>

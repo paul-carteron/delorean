@@ -43,7 +43,7 @@ library(happign)
 It intersects the `bbox` of `x` (area of interest) with all photo footprints.
 Additional filters can be applied: `year`, `color`, and `oblique` (see `?delorean::find_photos`).
 
-```{r find_photos}
+```{r find_photos, message=FALSE, warning=FALSE}
 x <- get_apicarto_cadastre("29158")
 all_photos <- find_photos(x)
 
@@ -59,12 +59,12 @@ plot(st_geometry(x), col = "firebrick", add = TRUE)
 For downloading, use `get_photos()` with the source returned by `find_photos()`.
 By default, the mode is set to `raw`, meaning the image has no spatial reference.
 
-```{r get_photos}
+```{r get_photos, warning=FALSE}
 # Using photo numero = 430 for the sake of example
 photo_1997 <- photos_1997[photos_1997$numero == 430, ]
 url <- photo_1997$url
 
-filepath <- get_photos(url, outdir = tempdir())
+filepath <- get_photos(url)
 photo <- rast(filepath)
 
 plot(photo)
@@ -80,7 +80,7 @@ The `gcp` mode only attaches Ground Control Points (GCPs), so the photo is geore
 The `warp` mode takes longer but resamples the photo to a grid, ensuring compatibility with most GIS software.
 
 ```{r default_georef}
-filepath <- get_photos(url, outdir = "C:\\Users\\PaulCarteron\\Desktop\\temp\\dolorean", mode = "warp")
+filepath <- get_photos(url, mode = "warp")
 photo <- rast(filepath)
 
 plot(photo)
@@ -93,7 +93,7 @@ Because the default georeferencing remains **significantly inaccurate**, `delore
 This wrapper around `happign::get_wfs()` downloads prominent features that can assist in georeferencing, such as hydrological elements, infrastructure, roads, and buildings.
 All these layers are retrieved from IGN’s [BD TOPO® V3](https://geoservices.ign.fr/bdtopo) dataset.
 
-```{r georegf_helpers}
+```{r georegf_helpers, message=FALSE, warning=FALSE}
 georef_helpers <- get_georef_helpers(x, "infra", "other")
 
 plot(project(vect(x), crs(photo)), col = "grey90", border = "grey50", main = "Georef helpers on Penmarc'h")

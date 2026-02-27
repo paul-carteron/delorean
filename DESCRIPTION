@@ -8,7 +8,7 @@ Description: Tools to search, download, and georeference french historical aeria
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Suggests: 
     httptest2,
     terra,
@@ -16,9 +16,11 @@ Suggests:
 Config/testthat/edition: 3
 Imports: 
     cli,
+    curl,
     gdalraster,
-    happign,
+    happign (>= 0.3.8),
     methods,
-    sf
+    sf,
+    tinyplot
 Depends: R (>= 4.1.0)
 URL: https://paul-carteron.github.io/delorean/

@@ -3,7 +3,7 @@
 #' @param x Object of class `sf` or `sfc`
 #' @param year `integer`; multiple years can be set with vector `c(1980, 1990)`
 #' or range `1980:2990`. If `NULL` all years available are returned
-#' @param color `character`; One or many of `"P"` (black and white), `"C"` (color),
+#' @param color `character`; One or many of `"P"` (classic photo), `"C"` (color, rgb image),
 #' `"IR"` (infra-red) or `"IRC"` (infra-red color). All by default.
 #' @param oblique `logical`; `FALSE` for **vertical** aerial photos
 #' (camera pointing straight down), `TRUE` for **oblique**  photos. Use `NA`
@@ -34,8 +34,12 @@
 #' )
 #' centroid <- st_transform(centroid, 4326)
 #'
-#' plot(st_geometry(images_metadata[1,]), col = "grey80", border = "grey60", main = "Photo footprint and centroid")
-#' plot(st_geometry(images_centroid[1,]), col = "blue", pch = 20, add = TRUE)
+#' plot(
+#'   st_geometry(images_metadata[1,]),
+#'   col = "grey80", border = "grey60",
+#'   main = "Photo footprint and centroid"
+#'  )
+#' plot(st_geometry(centroid[1,]), col = "blue", pch = 20, add = TRUE)
 #' plot(st_geometry(x), col = "red", add = TRUE)
 #' }
 #'
@@ -43,13 +47,13 @@ find_photos <- function(x, year = NULL, color = c("P", "C", "IR", "IRC"), obliqu
 
   check_find_photos(x, year, color, oblique)
 
-  mission <- get_wfs(x, "pva:dataset") |>
+  mission <- happign::get_wfs(x, "pva:dataset", predicate = happign::intersects(), verbose = FALSE) |>
     st_drop_geometry() |>
     suppressMessages() |>
     suppressWarnings()
   mission[, c("id")] <- NULL
 
-  image <- get_wfs(x, "pva:image") |>
+  image <- happign::get_wfs(x, "pva:image", predicate = happign::intersects(), verbose = FALSE) |>
     merge(mission) |>
     suppressMessages() |>
     suppressWarnings()
@@ -61,7 +65,7 @@ find_photos <- function(x, year = NULL, color = c("P", "C", "IR", "IRC"), obliqu
   }
 
   if (nrow(image) == 0){
-    cli::cli_alert_warning("No data found, {.val NULL} is returned")
+    cli::cli_warn("No data found, {.val NULL} is returned")
     return(NULL)
   }
 

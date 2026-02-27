@@ -9,7 +9,7 @@ get_photos(
   outdir = NULL,
   mode = "raw",
   quiet = FALSE,
-  overwrite = TRUE
+  overwrite = FALSE
 )
 }
 \arguments{

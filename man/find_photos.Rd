@@ -12,7 +12,7 @@ find_photos(x, year = NULL, color = c("P", "C", "IR", "IRC"), oblique = FALSE)
 \item{year}{\code{integer}; multiple years can be set with vector \code{c(1980, 1990)}
 or range \code{1980:2990}. If \code{NULL} all years available are returned}
 
-\item{color}{\code{character}; One or many of \code{"P"} (black and white), \code{"C"} (color),
+\item{color}{\code{character}; One or many of \code{"P"} (classic photo), \code{"C"} (color, rgb image),
 \code{"IR"} (infra-red) or \code{"IRC"} (infra-red color). All by default.}
 
 \item{oblique}{\code{logical}; \code{FALSE} for \strong{vertical} aerial photos
