@@ -64,3 +64,6 @@ photo <- get_photos(image_metadata$url[1], tmp)
 plot(rast(photo))
 }
 }
+\seealso{
+\code{\link[curl:multi_download]{curl::multi_download()}}
+}

@@ -27,7 +27,10 @@
 #' deformation is applied beyond shift, rotation, and scale. All georeferenced
 #' outputs are written in **EPSG:3857 (Web Mercator)**.
 #'
+#' @seealso [curl::multi_download()]
+#'
 #' @returns `character`; filepaths of each photos
+#'
 #' @export
 #'
 #' @examples
@@ -41,99 +44,143 @@
 #'
 #' plot(rast(photo))
 #' }
-get_photos <- function(source, outdir = NULL, mode = "raw", quiet = FALSE, overwrite = FALSE){
+get_photos <- function(
+    source,
+    outdir = NULL,
+    mode = "raw",
+    quiet = FALSE,
+    overwrite = FALSE
+){
 
-  if (is.null(outdir)){
+  if (!mode %in% c("raw", "gcp", "warp")) {
+    cli::cli_abort(c(
+      "x" = "Invalid {.arg mode}: {.val {mode}}.",
+      "i" = "Must be one of {.val raw}, {.val gcp}, {.val warp}."
+    ))
+  }
+
+  if (is.null(outdir)) {
     outdir <- tools::R_user_dir("delorean", "cache")
   }
 
   if (!dir.exists(outdir)) {
     dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+    if (!quiet) cli::cli_alert_info("Created directory {.file {outdir}}.")
   }
 
-  n <- length(source)
-  raw_files <- character(n)
-  h <- curl::new_handle()
-  for (i in seq_along(source)){
-    ids <- url_parser(source[i])
-    filename <- paste0(ids$image_identifier, "_raw.tif")
-    filepath <- file.path(outdir, filename)
+  # ---- DOWNLOAD PHASE ----
 
-    if (file.exists(filepath) && !overwrite) {
-      if (!quiet) message("Already downloaded: ", basename(filepath))
-      raw_files[i] <- filepath
-      next
-    }
+  ids <- url_parser(source)
+  raw_files <- file.path(outdir, paste0(ids$image_identifier, "_raw.tif"))
 
-    if (!quiet) message(sprintf("Downloading [%d/%d] ", i, n))
-    curl::curl_download(source[i], filepath, quiet = quiet, handle = h)
-    raw_files[i] <- filepath
+  res <- curl::multi_download(
+    urls = source,
+    destfiles = raw_files,
+    resume = TRUE,
+    progress = !quiet
+  )
+
+  failed <- !res$success
+  if (all(failed)){
+    cli::cli_abort("All downloads failed.")
+  }
+
+  if (any(failed, na.rm = TRUE)) {
+    cli::cli_alert_warning("{sum(failed, na.rm = TRUE)} download{?s} failed.")
+  }
+
+  success <- res[res$success, , drop = FALSE]
+  if (nrow(success) == 0) {
+    cli::cli_abort("No successful downloads.")
   }
 
   if (mode == "raw") {
-    return(invisible(raw_files))
+    if (!quiet) cli::cli_alert_success("Download complete.")
+    return(invisible(success$destfile))
   }
 
-  files <- character(n)
-  source_metadata <- reverse_url_metadata(source)
-  for (i in seq_along(raw_files)){
-    raw_path <- raw_files[i]
-    ids <- url_parser(source[i])
-    final_path <- file.path(outdir, paste0(ids$image_identifier, ".tif"))
+  # ---- PROCESSING PHASE ----
+
+  source_metadata <- reverse_url_metadata(success$url)
+  n <- nrow(success)
+  final_files <- character(n)
+
+  for (i in seq_len(n)) {
+
+    raw_path <- success$destfile[i]
+    filename <- basename(success$url[i])
+    final_path <- file.path(outdir, filename)
+
+    if (!quiet) cli::cli_alert_info(sprintf("Processing [%s/%s]", i, n))
 
     if (file.exists(final_path) && !overwrite) {
-      if (!quiet) message("Skipping processing: ", basename(final_path))
-      files[i] <- filepath
+      final_files[i] <- final_path
       next
     }
 
-    if (!quiet) message(sprintf("Processing [%d/%d] ", i, n))
-
-    gcp_args <- build_gcp_args(
-      source = raw_path,
-      center_x = source_metadata$x[i],
-      center_y = source_metadata$y[i],
-      resolution = source_metadata$resolution[i],
-      orientation = source_metadata$orientation[i]
+    gcp_args <- tryCatch(
+      build_gcp_args(
+        source = raw_path,
+        center_x = source_metadata$x[i],
+        center_y = source_metadata$y[i],
+        resolution = source_metadata$resolution[i],
+        orientation = source_metadata$orientation[i]
+      ),
+      error = function(e) {
+        cli::cli_abort(c(
+          "x" = "Failed building GCP for {.file {basename(raw_path)}}.",
+          "i" = conditionMessage(e)
+        ))
+      }
     )
 
     tmp_path <- tempfile(fileext = ".tif")
 
-    gdalraster::translate(
-      raw_path,
-      tmp_path,
-      cl_arg = c(
-        "-a_srs", "EPSG:3857",
-        gcp_args,
-        "-co", "COMPRESS=LZW",
-        "-co", "TILED=YES"
-      ),
-      quiet = quiet
-    )
+    tryCatch({
 
-    if (mode == "warp") {
-
-      gdalraster::warp(
+      gdalraster::translate(
+        raw_path,
         tmp_path,
-        final_path,
-        t_srs = "EPSG:3857",
         cl_arg = c(
-          "-order", "1",
-          "-r", "bilinear",
+          "-a_srs", "EPSG:3857",
+          gcp_args,
           "-co", "COMPRESS=LZW",
           "-co", "TILED=YES"
         ),
         quiet = quiet
       )
 
-      unlink(tmp_path)
+      if (mode == "warp") {
 
-    } else {
-      file.rename(tmp_path, final_path)
-    }
+        gdalraster::warp(
+          tmp_path,
+          final_path,
+          t_srs = "EPSG:3857",
+          cl_arg = c(
+            "-order", "1",
+            "-r", "bilinear",
+            "-co", "COMPRESS=LZW",
+            "-co", "TILED=YES"
+          ),
+          quiet = quiet
+        )
 
-    files[i] <- final_path
+        unlink(tmp_path)
+
+      } else {
+        file.rename(tmp_path, final_path)
+      }
+
+    }, error = function(e) {
+      cli::cli_abort(c(
+        "x" = "Processing failed for {.file {basename(raw_path)}}.",
+        "i" = conditionMessage(e)
+      ))
+    })
+
+    final_files[i] <- final_path
+
   }
 
-  return(invisible(final_path))
+  return(final_files)
 }
