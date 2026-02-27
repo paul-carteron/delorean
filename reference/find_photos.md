@@ -58,8 +58,12 @@ centroid <- st_as_sf(
 )
 centroid <- st_transform(centroid, 4326)
 
-plot(st_geometry(images_metadata[1,]), col = "grey80", border = "grey60", main = "Photo footprint and centroid")
-plot(st_geometry(images_centroid[1,]), col = "blue", pch = 20, add = TRUE)
+plot(
+  st_geometry(images_metadata[1,]),
+  col = "grey80", border = "grey60",
+  main = "Photo footprint and centroid"
+ )
+plot(st_geometry(centroid[1,]), col = "blue", pch = 20, add = TRUE)
 plot(st_geometry(x), col = "red", add = TRUE)
 } # }
 ```
