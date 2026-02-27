@@ -48,9 +48,9 @@ library(happign)
 ### Explore
 
 `delorean` allows exploration of available aerial photos with
-`find_photos()`. It intersects the `bbox` of `x` (area of interest) with
-all photo footprints. Additional filters can be applied: `year`,
-`color`, and `oblique` (see `?delorean::find_photos`).
+`find_photos()`. It intersects `x` (area of interest) with all photo
+footprints. Additional filters can be applied: `year`, `color`, and
+`oblique` (see `?delorean::find_photos`).
 
 ``` r
 x <- get_apicarto_cadastre("29158")
@@ -64,6 +64,15 @@ plot(st_geometry(x), col = "firebrick", add = TRUE)
 ```
 
 <img src="man/figures/README-find_photos-1.png" alt="" width="100%" />
+To get an overview of all available photographs for a given area,
+plot_photos(x) generates a bar chart summarizing the number of images by
+year and color type
+
+``` r
+plot_photos(x)
+```
+
+<img src="man/figures/README-plot_photos-1.png" alt="" width="100%" />
 
 ### Download
 
@@ -100,8 +109,6 @@ with most GIS software.
 ``` r
 filepath <- get_photos(url, mode = "warp")
 #> ℹ Processing [1/1]
-#> 0...10...20...30...40...50...60...70...80...90...100 - done.
-#> 0...10...20...30...40...50...60...70...80...90...100 - done.
 photo <- rast(filepath)
 
 plot(photo)
