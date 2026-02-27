@@ -66,6 +66,10 @@ The affine transformation is used, which means no geometric deformation
 is applied beyond shift, rotation, and scale. All georeferenced outputs
 are written in **EPSG:3857 (Web Mercator)**.
 
+## See also
+
+[`curl::multi_download()`](https://jeroen.r-universe.dev/curl/reference/multi_download.html)
+
 ## Examples
 
 ``` r
